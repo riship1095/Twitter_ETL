@@ -7,9 +7,9 @@ import s3fs
 def extract_tweets():
     #access keys and tokens
     access_key = 'vxHC7qPyBPbOCDw9jKXi8mAM8'
-    access_secret = 'jQrBhR3vPSi9KDxTE6Sh9zfxzyGXuxBGTDU49HChnJrdYQbrFK'
+    access_secret = '*****************************'
     consumer_key = '1454991475754799104-9iQdPVmU2PbFpHukgm9Kdh535GZoMH'
-    consumer_secret = 'sMViLQqANlJg399FaSbDUeOuX2isIP6y0TeA6Jlznu8Kk'
+    consumer_secret = '*****************************'
 
     #Twitter Authentication
     auth = tweepy.OAuthHandler(access_key, access_secret)
