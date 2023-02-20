@@ -4,6 +4,8 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 from datetime import datetime
 from twitter_etl import extract_tweets
+from twitter_etl import transform_tweets
+from twitter_etl import load_tweets
 
 default_args = {
     'owner':'airflow',
@@ -22,10 +24,22 @@ dag = DAG(
     description='DAG1'
 )
 
-run_etl = PythonOperator(
-    task_id = 'Extract_tweets_task',
+extraction_task = PythonOperator(
+    task_id = 'Extract_tweets',
     python_callable = extract_tweets,
     dag = dag
 )
 
-run_etl
+transformation_task = PythonOperator(
+    task_id = 'Transform_tweets',
+    python_callable = transform_tweets,
+    dag = dag
+)
+
+load_task = PythonOperator(
+    task_id = 'Load_tweets',
+    python_callable = load_tweets,
+    dag = dag
+)
+
+extraction_task >> transformation_task >> load_task
