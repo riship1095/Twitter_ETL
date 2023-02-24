@@ -5,12 +5,12 @@ from datetime import datetime
 import s3fs
 import airflow
 
-def extract_tweets(ti):
+def extract_tweets():
     #access keys and tokens
     access_key = 'vxHC7qPyBPbOCDw9jKXi8mAM8'
-    access_secret = '*****************************'
+    access_secret = 'jQrBhR3vPSi9KDxTE6Sh9zfxzyGXuxBGTDU49HChnJrdYQbrFK'
     consumer_key = '1454991475754799104-9iQdPVmU2PbFpHukgm9Kdh535GZoMH'
-    consumer_secret = '*****************************'
+    consumer_secret = 'sMViLQqANlJg399FaSbDUeOuX2isIP6y0TeA6Jlznu8Kk'
 
     #Twitter Authentication
     auth = tweepy.OAuthHandler(access_key, access_secret)
@@ -24,12 +24,7 @@ def extract_tweets(ti):
                                include_rts = False,
                                tweet_mode = 'extended')
     
-    ti.xcom_push(key='tweeter_extract',value=musk_tweets)
-    
-def transform_tweets(ti):
     tweet_list = []
-    musk_tweets = ti.xcom_pull(key="tweeter_extract", task_ids='extract_tweets')
-    
     for tweet in musk_tweets:
         text = tweet._json['full_text']
 
@@ -40,10 +35,10 @@ def transform_tweets(ti):
                          "created_at": tweet.created_at}
 
         tweet_list.append(refined_tweet)
-      
-    ti.xcom_push(key='tweeter_transform',value=tweet_list)
-    
-def load_tweets(ti):
-    tweet_list = ti.xcom_pull(key='tweeter_transform',task_ids='transform_tweets')
+
     df = pd.DataFrame(tweet_list)
+    df.to_csv('files/elonmusk_twitter_data.csv')
+
+def load_to_s3():
+    df = pd.read_csv('files/elonmusk_twitter_data.csv')
     df.to_csv("s3://test-bucket-0410-01/elonmusk_twitter_data.csv")
