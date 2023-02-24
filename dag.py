@@ -1,11 +1,9 @@
-from datetime import timedelta
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
-from datetime import datetime
+from datetime import datetime,timedelta
 from twitter_etl import extract_tweets
-from twitter_etl import transform_tweets
-from twitter_etl import load_tweets
+from twitter_etl import load_to_s3
 
 default_args = {
     'owner':'airflow',
@@ -30,16 +28,10 @@ extraction_task = PythonOperator(
     dag = dag
 )
 
-transformation_task = PythonOperator(
-    task_id = 'Transform_tweets',
-    python_callable = transform_tweets,
-    dag = dag
-)
-
 load_task = PythonOperator(
     task_id = 'Load_tweets',
-    python_callable = load_tweets,
+    python_callable = load_to_s3,
     dag = dag
 )
 
-extraction_task >> transformation_task >> load_task
+extraction_task >> load_task
